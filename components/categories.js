@@ -1,8 +1,27 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { categories } from '../constants'
+import { useSQLiteContext } from 'expo-sqlite'
+import { getCategories } from '../db/menu'
 
-export default function Categories() {
+export default function Categories({ activeCategory, setActiveCategory }) {
+  const db = useSQLiteContext();
+  const [categoriesList, setCategoriesList] = useState([]);
+
+  useEffect(() => {
+      async function loadData() {
+        try {
+          const data = await getCategories(db);
+          setCategoriesList(data);
+          if (data.length > 0 && !activeCategory) {
+            setActiveCategory(data[0].category_id); // เลือกหมวดแรกเป็นค่าเริ่มต้น
+          }
+        } catch (error) {
+          console.error("Error loading categories:", error);
+        }
+      }
+      loadData();
+    }, [db]);
   return (
     <View className="mt-4">
     <ScrollView
@@ -14,12 +33,15 @@ export default function Categories() {
       }}
     >
       {
-        categories.map((category, index) =>{
+        categoriesList.map((category) =>{
+          const isActive = category.category_id === activeCategory;
           return (
-            <View key={index} className="flex justify-center items-center mr-6">
+            <View key={category.category_id} className="flex justify-center items-center mr-6">
               <TouchableOpacity
-                className="p-1 rounded-full shadow bg-gray-200">
-                <Text>{category.name}</Text>
+                onPress={() => setActiveCategory(category.category_id)}
+                className={`p-2 px-4 rounded-full shadow ${isActive ? 'bg-orange-500' : 'bg-gray-200'}`}
+              >
+                <Text className={isActive ? 'text-white font-bold' : 'text-gray-700'}>{category.name}</Text>
               </TouchableOpacity>
             </View>
           )
