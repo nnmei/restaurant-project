@@ -5,8 +5,6 @@ import { StatusBar } from 'expo-status-bar'
 import * as Icon from 'react-native-feather';
 import { themeColors } from '../theme';
 import Categories from '../components/categories'
-import FeaturedRow from '../components/featuredRow'
-import { featured } from '../constants'
 import { useSQLiteContext } from 'expo-sqlite'
 import { getFoodByCategory } from '../db/menu'
 import DishRow from '../components/dishRow';
