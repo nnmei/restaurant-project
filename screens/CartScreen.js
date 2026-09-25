@@ -94,7 +94,7 @@ export default function CartScreen() {
             
             {/* แถบหัวบิล */}
             <View style={{backgroundColor: themeColors.bgColor(0.2)}} className="flex-row px-4 py-2 items-center">
-                <Image source={require('../assets/images/check.png')} className="w-12 h-12 rounded-full" />
+                <Image source={require('../assets/images/fullStar.png')} className="w-12 h-12 rounded-full" />
                 <Text className="flex-1 pl-4 font-bold text-gray-700">รายการสั่งอาหารรอบปัจจุบัน</Text>
             </View>
 
