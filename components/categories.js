@@ -1,6 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { categories } from '../constants'
 import { useSQLiteContext } from 'expo-sqlite'
 import { getCategories } from '../db/menu'
 
