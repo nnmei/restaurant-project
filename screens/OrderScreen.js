@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { View, Text, FlatList, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import { TABLES } from '../constants/data';
 import { TBstyle } from '../constants/TBstyle';
 import { CardTable } from '../components/cardTable';
+import { OrderStyle } from '../constants/OrderStyle';
 
 export default function OrderScreen() {
 
@@ -12,10 +11,16 @@ export default function OrderScreen() {
         <SafeAreaView style={TBstyle.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
             <View style={TBstyle.header}>
-                <Text style={TBstyle.screenTitle}>สถานะโต๊ะอาหาร</Text>
-                <Text style={TBstyle.screenSubtitle}>
-                    ติดตามสถานะและยอดชำระของแต่ละโต๊ะ
-                </Text>
+                <Text style={TBstyle.screenTitle}>รายการสั่งอาหาร</Text>
+            </View>
+            <View style={OrderStyle.orderContainer}>
+                <FlatList
+                    data={TABLES}
+                    renderItem={({ item }) => (
+                        <CardTable item={item} />
+                    )}
+                    keyExtractor={(item) => item.id.toString()}
+                />
             </View>
         </SafeAreaView>
     )

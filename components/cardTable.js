@@ -1,13 +1,10 @@
-import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { TBstyle } from '../constants/TBstyle';
 
-// ฟังก์ชันตรวจสอบว่าโต๊ะมีบิลค้างหรือไม่
 const hasPendingBill = (status) => {
   return status === 'pending' || status === 'occupied' || status === 'unpaid';
 };
 
-// รับ item, สถานะ isSelected, และ Callback onSelect เข้ามาทาง Props
 export const CardTable = ({ item, isSelected, onSelect }) => {
   const isPending = hasPendingBill(item.status);
 
