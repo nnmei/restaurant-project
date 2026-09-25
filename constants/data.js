@@ -1,4 +1,4 @@
-export const MOCK_TABLES = [
+export const TABLES = [
   { id: 'T01', number: '1', seats: 2, status: 'available', total: 0 },
   { id: 'T02', number: '2', seats: 2, status: 'occupied', total: 160 },
   { id: 'T03', number: '3', seats: 4, status: 'available', total: 0 },

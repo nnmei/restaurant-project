@@ -24,7 +24,6 @@ export const TBstyle = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 24,
   },
-  
   card: {
     flex: 1,
     margin: 8,
@@ -39,18 +38,19 @@ export const TBstyle = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 6,
   },
-
+  cardSelected: {
+    borderWidth: 1.5,
+    borderColor: '#22c55e',
+  },
   cardAvailable: {
     borderWidth: 1.5,
     borderColor: '#e2e8f0',
   },
-
   cardPending: {
     borderWidth: 1.5,
     borderColor: '#f97316',
     backgroundColor: '#fffaf5',
   },
-
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -62,7 +62,6 @@ export const TBstyle = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1e293b',
   },
-
   badge: {
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -84,7 +83,6 @@ export const TBstyle = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-
   cardBody: {
     marginTop: 4,
   },
@@ -102,5 +100,19 @@ export const TBstyle = StyleSheet.create({
     fontSize: 14,
     color: '#22c55e',
     fontWeight: '500',
+  },
+  button: {
+    backgroundColor: '#22c55e',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: '5%',
+    marginVertical: '5%',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
