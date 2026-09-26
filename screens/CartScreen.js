@@ -2,26 +2,32 @@ import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from 'react-na
 import React, { useEffect, useState } from 'react'
 import { themeColors } from '../theme';
 import * as Icon from "react-native-feather"
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux';
 
-// [แก้จุดที่ 1]: นำ emptyCart เข้ามาใช้ และตัด selectRestaurant ที่ไม่ได้ใช้ออก
 import { removeFromCart, emptyCart, selectCartItems, selectCartTotal } from '../slices/cartSlice';
 
-// [แก้จุดที่ 2]: นำตัวเชื่อมต่อ SQLite และฟังก์ชันบันทึกรอบการสั่งมาใช้งาน
 import { useSQLiteContext } from 'expo-sqlite';
 import { submitOrderRound } from '../db/orders';
+// [แก้]: เพิ่ม getOrCreateActiveBill มาใช้เปิด/หาบิลจริงของโต๊ะ แทนการ hardcode billId
+import { getOrCreateActiveBill } from '../db/tables';
 
 export default function CartScreen() {
     const navigation = useNavigation();
+    const route = useRoute();
     const dispatch = useDispatch();
     const db = useSQLiteContext(); // เรียกใช้งานฐานข้อมูล SQLite
+
+   
+    const tableId = route.params?.tableId || 1;
 
     const cartItems = useSelector(selectCartItems);
     const cartTotal = useSelector(selectCartTotal);
     const [groupedItems, setGroupedItems] = useState({});
+    
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // จัดกลุ่มอาหารเหมือนเดิมของคุณทุกประการ
+    
     useEffect(() => {
         const items = cartItems.reduce((group, item) => {
             const key = `${item.food_id || item.id}_${item.note || ''}`;
@@ -36,7 +42,7 @@ export default function CartScreen() {
     }, [cartItems]);
 
     // -------------------------------------------------------------
-    // [ฟังก์ชันใหม่ที่เพิ่ม]: จัดการเมื่อกดปุ่ม Place Order (ก4)
+    // จัดการเมื่อกดปุ่ม Place Order (ก4)
     // -------------------------------------------------------------
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
@@ -44,8 +50,11 @@ export default function CartScreen() {
             return;
         }
 
+        // [แก้]: ถ้ากำลังส่งออเดอร์อยู่ ห้ามกดซ้ำ
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
         try {
-            // แปลงรูปแบบรายการในตะกร้าให้ตรงกับโครงสร้าง order_items ในฐานข้อมูล
             const orderItemsPayload = Object.entries(groupedItems).map(([key, items]) => {
                 const dish = items[0];
                 return {
@@ -56,21 +65,23 @@ export default function CartScreen() {
                 };
             });
 
-            // ในช่วงที่ยังไม่ได้ทำหน้าเลือกโต๊ะ กำหนด billId เป็น 1 จำลองไว้ก่อน
-            const mockBillId = 1;
+           
+            const activeBill = await getOrCreateActiveBill(db, tableId);
 
-            // บันทึกคำสั่งซื้อลง SQLite (orders + order_items ผ่าน Transaction)
-            await submitOrderRound(db, mockBillId, orderItemsPayload);
+            
+            await submitOrderRound(db, activeBill.bill_id, orderItemsPayload);
 
-            // เคลียร์ตะกร้าใน Redux
+            
             dispatch(emptyCart());
 
             Alert.alert("สำเร็จ", "ส่งรายการอาหารเข้าครัวเรียบร้อยแล้ว!", [
-                { text: "ตกลง", onPress: () => navigation.goBack() }
+                { text: "ตกลง", onPress: () => navigation.navigate('kitchen') }
             ]);
         } catch (error) {
             console.error("Error submitting order:", error);
             Alert.alert("ผิดพลาด", "ไม่สามารถส่งออเดอร์ได้ กรุณาลองใหม่");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -87,7 +98,6 @@ export default function CartScreen() {
                 </TouchableOpacity>
                 <View>
                     <Text className="text-center font-bold text-xl">ตะกร้าของคุณ</Text>
-                    {/* [แก้]: เปลี่ยนจาก restaurant.name เป็นข้อความของร้าน */}
                     <Text className="text-center text-gray-500">ตรวจสอบรายการก่อนส่งเข้าครัว</Text>
                 </View>
             </View>
@@ -98,7 +108,7 @@ export default function CartScreen() {
                 <Text className="flex-1 pl-4 font-bold text-gray-700">รายการสั่งอาหารรอบปัจจุบัน</Text>
             </View>
 
-            {/* รายการอาหาร dishes (โครงสร้างเดิมของคุณทั้งหมด) */}
+            {/* รายการอาหาร dishes */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 50 }}
@@ -115,7 +125,6 @@ export default function CartScreen() {
                                 <Text className="font-bold" style={{color: themeColors.text}}>
                                     {items.length} x 
                                 </Text>
-                                {/* เพิ่มรูปสำรองกรณีไม่มีรูปภาพแนบมา */}
                                 <Image 
                                     className="h-14 w-14 rounded-full" 
                                     source={dish.image ? dish.image : require('../assets/images/pizzaDish.png')} 
@@ -129,7 +138,6 @@ export default function CartScreen() {
                                     ) : null}
                                 </View>
                                 
-                                {/* [แก้]: เปลี่ยน $ เป็น ฿ */}
                                 <Text className="font-semibold text-base">฿{dish.price}</Text>
                                 
                                 <TouchableOpacity
@@ -149,18 +157,18 @@ export default function CartScreen() {
             <View style={{backgroundColor: themeColors.bgColor(0.2)}} className="p-6 px-8 rounded-t-3xl space-y-4">
                 <View className="flex-row justify-between">
                     <Text className="text-gray-700 font-extrabold text-lg">ยอดรวมรอบนี้</Text>
-                    {/* [แก้]: ตัด Delivery Fee ออก และเปลี่ยนเป็น ฿ */}
                     <Text className="text-gray-700 font-extrabold text-lg">฿{cartTotal}</Text>
                 </View>
 
                 <View>
                     <TouchableOpacity 
                         onPress={handlePlaceOrder}
-                        style={{backgroundColor: themeColors.bgColor(1)}} 
+                        disabled={isSubmitting}
+                        style={{backgroundColor: themeColors.bgColor(isSubmitting ? 0.5 : 1)}} 
                         className="p-3 rounded-full mt-2"
                     >
                         <Text className="text-white text-center font-bold text-lg">
-                            Place Order (ส่งเข้าครัว)
+                            {isSubmitting ? 'กำลังส่ง...' : 'Place Order (ส่งเข้าครัว)'}
                         </Text>
                     </TouchableOpacity>
                 </View>
