@@ -1,10 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = { 
-    items: [],
+const initialState = {
+  items:[],
 }
-
-export const cartSlice = createSlice({
+const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
@@ -21,6 +20,13 @@ export const cartSlice = createSlice({
       }
       state.items = newCart;
     },
+    // ใหม่: อัปเดตหมายเหตุของ "ทุกชิ้น" ที่เป็นเมนูเดียวกันในตะกร้า
+    updateNoteForFood: (state, action) => {
+      const { food_id, note } = action.payload;
+      state.items = state.items.map(item =>
+        (item.food_id || item.id) === food_id ? { ...item, note } : item
+      );
+    },
     emptyCart: (state, action) => {
       state.items = [];
     },
@@ -28,7 +34,7 @@ export const cartSlice = createSlice({
 })
 
 // Action creators
-export const { addToCart, removeFromCart, emptyCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateNoteForFood, emptyCart } = cartSlice.actions;
 
 export const selectCartItems = state => state.cart.items;
 
