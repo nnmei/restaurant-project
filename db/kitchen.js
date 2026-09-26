@@ -17,7 +17,7 @@ export async function getKitchenQueue(db) {
     JOIN bills b ON o.bill_id = b.bill_id
     JOIN tables t ON b.table_id = t.table_id
     JOIN food f ON oi.food_id = f.food_id
-    WHERE oi.item_status IN ('pending', 'cooking')
+    WHERE oi.item_status IN ('pending', 'cooking','served')
     ORDER BY oi.created_at ASC;
   `);
 }
