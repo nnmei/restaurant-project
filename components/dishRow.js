@@ -1,10 +1,10 @@
 import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { themeColors } from '../theme'
 import * as Icon from 'react-native-feather';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, removeFromCart, selectCartItems } from '../slices/cartSlice';
+import { addToCart, removeFromCart, updateNoteForFood, selectCartItems } from '../slices/cartSlice';
 
 export default function DishRow({item}) {
     const dispatch = useDispatch();
@@ -22,6 +22,14 @@ export default function DishRow({item}) {
     const handleDecrease = () => {
         dispatch(removeFromCart({id: item.food_id}))
     }
+
+    // ใหม่: ทุกครั้งที่พิมพ์หมายเหตุ ถ้าเมนูนี้มีอยู่ในตะกร้าแล้ว ให้อัปเดตของที่มีอยู่ด้วย
+    useEffect(() => {
+        if (itemCount > 0) {
+            dispatch(updateNoteForFood({ food_id: item.food_id, note: note.trim() }));
+        }
+    }, [note]);
+    
   return (
     <View className="flex-row items-center bg-white p-3 rounded-3xl shadow-2xl mb-3 mx-2">
         <Image className="rounded-3xl" style={{height: 100, width: 100}}
