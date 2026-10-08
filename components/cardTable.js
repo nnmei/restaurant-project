@@ -14,7 +14,6 @@ export const CardTable = ({ item, isSelected, onSelect }) => {
       style={[
         TBstyle.card,
         isPending ? TBstyle.cardPending : TBstyle.cardAvailable,
-        // เพิ่มสไตล์เมื่อโต๊ะถูกเลือก (ให้มีผลทับสไตล์ก่อนหน้า)
         isSelected && TBstyle.cardSelected,
       ]}
       onPress={() => onSelect(item.id)}
