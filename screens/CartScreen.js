@@ -9,23 +9,31 @@ import { removeFromCart, emptyCart, selectCartItems, selectCartTotal } from '../
 
 import { useSQLiteContext } from 'expo-sqlite';
 import { submitOrderRound } from '../db/orders';
-// [แก้]: เพิ่ม getOrCreateActiveBill มาใช้เปิด/หาบิลจริงของโต๊ะ แทนการ hardcode billId
 import { getOrCreateActiveBill } from '../db/tables';
 
 export default function CartScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const dispatch = useDispatch();
-    const db = useSQLiteContext(); // เรียกใช้งานฐานข้อมูล SQLite
+    const db = useSQLiteContext(); 
 
    
     const tableId = route.params?.tableId || 1;
-
     const cartItems = useSelector(selectCartItems);
     const cartTotal = useSelector(selectCartTotal);
     const [groupedItems, setGroupedItems] = useState({});
     
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const getCategoryEmoji = (categoryId) => {
+        switch (categoryId) {
+            case 1: return '🍛';
+            case 2: return '🍲';
+            case 3: return '🍟';
+            case 4: return '🥤';
+            default: return '🍽️';
+        }
+        };
 
     
     useEffect(() => {
@@ -41,16 +49,14 @@ export default function CartScreen() {
         setGroupedItems(items);
     }, [cartItems]);
 
-    // -------------------------------------------------------------
-    // จัดการเมื่อกดปุ่ม Place Order (ก4)
-    // -------------------------------------------------------------
+    
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
             Alert.alert("แจ้งเตือน", "ไม่มีรายการอาหารในตะกร้า");
             return;
         }
 
-        // [แก้]: ถ้ากำลังส่งออเดอร์อยู่ ห้ามกดซ้ำ
+        
         if (isSubmitting) return;
         setIsSubmitting(true);
 
@@ -87,7 +93,7 @@ export default function CartScreen() {
 
     return (
         <View className="bg-white flex-1 pt-10">
-            {/* back button และ ส่วนหัว */}
+            
             <View className="relative py-4 shadow-sm">
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
@@ -102,13 +108,13 @@ export default function CartScreen() {
                 </View>
             </View>
             
-            {/* แถบหัวบิล */}
+            
             <View style={{backgroundColor: themeColors.bgColor(0.2)}} className="flex-row px-4 py-2 items-center">
                 <Image source={require('../assets/images/fullStar.png')} className="w-12 h-12 rounded-full" />
                 <Text className="flex-1 pl-4 font-bold text-gray-700">รายการสั่งอาหารรอบปัจจุบัน</Text>
             </View>
 
-            {/* รายการอาหาร dishes */}
+        
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 50 }}
@@ -125,10 +131,11 @@ export default function CartScreen() {
                                 <Text className="font-bold" style={{color: themeColors.text}}>
                                     {items.length} x 
                                 </Text>
-                                <Image 
-                                    className="h-14 w-14 rounded-full" 
-                                    source={dish.image ? dish.image : require('../assets/images/pizzaDish.png')} 
-                                />
+                                <View className="h-12 w-12 rounded-full bg-orange-100 justify-center items-center">
+                                    <Text style={{ fontSize: 24 }}>
+                                        {getCategoryEmoji(dish.category_id)}
+                                    </Text>
+                                </View>
                                 <View className="flex-1">
                                     <Text className="font-bold text-gray-700">{dish.name}</Text>
                                     {dish.note ? (
@@ -153,7 +160,7 @@ export default function CartScreen() {
                 }
             </ScrollView>            
 
-            {/* ส่วนสรุปราคารวมและปุ่ม Place Order */}
+            
             <View style={{backgroundColor: themeColors.bgColor(0.2)}} className="p-6 px-8 rounded-t-3xl space-y-4">
                 <View className="flex-row justify-between">
                     <Text className="text-gray-700 font-extrabold text-lg">ยอดรวมรอบนี้</Text>
