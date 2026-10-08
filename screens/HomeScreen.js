@@ -1,4 +1,4 @@
-import { View, Text, TextInput, ScrollView } from 'react-native'
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
@@ -9,14 +9,21 @@ import { useSQLiteContext } from 'expo-sqlite'
 import { getFoodByCategory } from '../db/menu'
 import DishRow from '../components/dishRow';
 import CartIcon from '../components/cartIcon';
+import BottomNav from '../components/bottomNav';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
     const db = useSQLiteContext();
-    // [แก้จุดที่ 2]: สร้าง State เก็บหมวดที่เลือก และเก็บรายการอาหารที่ดึงจาก DB
+    const route = useRoute();
+    const navigation = useNavigation();
+
+    const tableId = route.params?.tableId || 1;
+    const tableNumber = route.params?.tableNumber || tableId;
+
     const [activeCategory, setActiveCategory] = useState(null);
     const [dishes, setDishes] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // [แก้จุดที่ 3]: เมื่อผู้ใช้กดเปลี่ยนหมวดหมู่ ให้วิ่งไปคิวรีอาหารหมวดนั้นมาจาก DB
     useEffect(() => {
         async function loadDishes() {
             if (!activeCategory) return;
@@ -29,54 +36,84 @@ export default function HomeScreen() {
         }
         loadDishes();
     }, [activeCategory, db]);
+
+    const filteredDishes = dishes.filter((dish) => {
+        if (searchQuery.trim() === '') {
+            return true;
+        }
+
+        const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const isAvailable = dish.is_available === 1;
+
+        return matchesSearch && isAvailable;
+    });
+
     return (
         <SafeAreaView className="bg-white flex-1">
             <StatusBar barStyle="dark-content" />
-            {/* search bar */}
-            <View className="flex-row items-center space-x-2 px-4 pb-2">
-                <View className="flex-row flex-1 items-center p-3 rounded-full border border-gray-300">
-                    <Icon.Search height="25" width="25" stroke="gray" />
-                    <TextInput placeholder='Restaurants' className="ml-2 flex-1" />
-                    <View className="flex-row items-center space-x-1 border-0 border-1-2 border-l-gray-300">
-                        <Icon.MapPin height="20" width="20" stroke="gray" />
-                        <Text className="text-gray-600">New york, NYC</Text>
-                    </View>
-                </View>
-                <View style={{backgroundColor: themeColors.bgColor(1)}} className="p-3 rounded-full">
-                    <Icon.Sliders height="20" width="20" strokeWidth={2.5} stroke="white" />
+
+            {/* แถบหัวโต๊ะ */}
+            <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-100">
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate('TableSelect')}
+                    className="flex-row items-center"
+                >
+                    <Icon.ArrowLeft stroke={themeColors.bgColor(1)} width={20} height={20} />
+                    <Text className="ml-1 text-gray-600 font-semibold">เปลี่ยนโต๊ะ</Text>
+                </TouchableOpacity>
+
+                <View className="bg-orange-100 px-3 py-1 rounded-full">
+                    <Text className="font-bold text-orange-600">
+                        กำลังสั่ง: โต๊ะ {tableNumber}
+                    </Text>
                 </View>
             </View>
 
-            {/* main */}
-            <ScrollView showVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    paddingBottom: 20
-                }}
+            {/* search bar */}
+            <View className="flex-row items-center space-x-2 px-4 py-2">
+                <View className="flex-row flex-1 items-center p-3 rounded-full border border-gray-300">
+                    <Icon.Search height="22" width="22" stroke="gray" />
+                    <TextInput 
+                        placeholder='ค้นหารายการอาหาร...' 
+                        className="ml-2 flex-1"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchQuery('')}>
+                            <Icon.X height="18" width="18" stroke="gray" />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
+            {/* หมวดหมู่ & รายการอาหาร */}
+            <ScrollView 
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 90 }}
             >
-                {/* categories */}
                 <Categories 
                     activeCategory={activeCategory} 
                     setActiveCategory={setActiveCategory}
                 />
 
-                {/* featured */}
-                <View className="mt-5">
+                <View className="mt-4">
                     <Text className="px-4 text-xl font-bold text-gray-800 mb-3">
                         รายการอาหาร
                     </Text>
                     {
-                        dishes.map((dish) => {
-                            return (
-                                <DishRow 
-                                    item={dish} 
-                                    key={dish.food_id} 
-                                />
-                            )
-                        })
+                        filteredDishes.map((dish) => (
+                            <DishRow 
+                                item={dish} 
+                                key={dish.food_id} 
+                            />
+                        ))
                     }
                 </View>
             </ScrollView>
-            <CartIcon />
+
+            <CartIcon tableId={tableId} />
+            <BottomNav />
         </SafeAreaView>
     )
 }
