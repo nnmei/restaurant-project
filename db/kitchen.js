@@ -1,6 +1,6 @@
 // db/kitchen.js
 
-// ดึงคิวอาหารเข้าครัว เรียงจากเก่าไปใหม่ (ก7, ก9)
+
 export async function getKitchenQueue(db) {
   return await db.getAllAsync(`
     SELECT 
@@ -22,7 +22,7 @@ export async function getKitchenQueue(db) {
   `);
 }
 
-// อัปเดตสถานะของแต่ละจาน: pending -> cooking -> served (ก8)
+
 export async function updateOrderItemStatus(db, orderItemId, nextStatus) {
   await db.runAsync(
     'UPDATE order_items SET item_status = ? WHERE order_item_id = ?;',
