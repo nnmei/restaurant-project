@@ -1,10 +1,19 @@
-import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
-import React from 'react'
-import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native' 
+import React, { useState, useEffect } from 'react'
 import { themeColors } from '../theme'
 import * as Icon from 'react-native-feather';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, removeFromCart, updateNoteForFood, selectCartItems } from '../slices/cartSlice';
+
+const getCategoryEmoji = (categoryId) => {
+  switch (categoryId) {
+    case 1: return '🍛'; // อาหารจานเดียว
+    case 2: return '🍲'; // กับข้าวและต้ม
+    case 3: return '🍟'; // ของทานเล่น
+    case 4: return '🥤'; // เครื่องดื่มและของหวาน
+    default: return '🍽️';
+  }
+};
 
 export default function DishRow({item}) {
     const dispatch = useDispatch();
@@ -12,9 +21,11 @@ export default function DishRow({item}) {
     const itemCount = cartItems.filter(cartItem => (cartItem.food_id || cartItem.id) === item.food_id).length;
 
     const [note, setNote] = useState('');
+    const isOutOfStock = item.is_available === 0;
 
     const handleIncrease = () => {
-        dispatch(addToCart({...item,
+        dispatch(addToCart({
+            ...item,
             id: item.food_id,
             note: note.trim()
         }));
@@ -23,7 +34,6 @@ export default function DishRow({item}) {
         dispatch(removeFromCart({id: item.food_id}))
     }
 
-    // ใหม่: ทุกครั้งที่พิมพ์หมายเหตุ ถ้าเมนูนี้มีอยู่ในตะกร้าแล้ว ให้อัปเดตของที่มีอยู่ด้วย
     useEffect(() => {
         if (itemCount > 0) {
             dispatch(updateNoteForFood({ food_id: item.food_id, note: note.trim() }));
@@ -32,16 +42,26 @@ export default function DishRow({item}) {
     
   return (
     <View className="flex-row items-center bg-white p-3 rounded-3xl shadow-2xl mb-3 mx-2">
-        <Image className="rounded-3xl" style={{height: 100, width: 100}}
-            source={item.image} />
+        
+        <View 
+            style={{ height: 80, width: 80 }} 
+            className="bg-orange-50 rounded-2xl justify-center items-center mr-2 border border-orange-100"
+        >
+            <Text style={{ fontSize: 40 }}>
+                {getCategoryEmoji(item.category_id)}
+            </Text>
+        </View>
+
         <View className="flex flex-1 space-y-3">
             <View className="pl-3">
-                <Text className="text-xl">{item.name}</Text>
+                <Text className="text-xl" style={{ textDecorationLine: isOutOfStock ? 'line-through' : 'none', color: isOutOfStock ? 'gray' : 'black' }}>
+                    {item.name} {isOutOfStock && <Text style={{ color: 'red', fontSize: 14 }}>(หมด)</Text>}
+                </Text>
                 <Text className="flex-row justify-between pl-3 items-center">{item.description}</Text>
             </View>
             <View className="flex-row justify-between pl-3 items-center">
                 <Text className="text-gray-700 text-lg font-bold">
-                    ${item.price}
+                    ฿{item.price}
                 </Text>
                 <View className="flex-row items-center">
                     <TouchableOpacity
@@ -56,11 +76,12 @@ export default function DishRow({item}) {
                         {itemCount}
                     </Text>
                     <TouchableOpacity
-                    onPress={handleIncrease}
+                        onPress={handleIncrease}
+                        disabled={isOutOfStock}
                         className="p-1 rounded-full"
-                        style={{backgroundColor: themeColors.bgColor(1)}}
+                        style={{backgroundColor: isOutOfStock ? '#ccc' : themeColors.bgColor(1)}}
                     >
-                    <Icon.Plus strokeWidth={2} height={20} width={20} stroke={'white'} />
+                        <Icon.Plus strokeWidth={2} height={20} width={20} stroke={'white'} />
                     </TouchableOpacity>
                 </View>
             </View>
