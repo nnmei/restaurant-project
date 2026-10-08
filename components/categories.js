@@ -13,7 +13,7 @@ export default function Categories({ activeCategory, setActiveCategory }) {
           const data = await getCategories(db);
           setCategoriesList(data);
           if (data.length > 0 && !activeCategory) {
-            setActiveCategory(data[0].category_id); // เลือกหมวดแรกเป็นค่าเริ่มต้น
+            setActiveCategory(data[0].category_id); 
           }
         } catch (error) {
           console.error("Error loading categories:", error);
