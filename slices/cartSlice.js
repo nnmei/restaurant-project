@@ -20,7 +20,6 @@ const cartSlice = createSlice({
       }
       state.items = newCart;
     },
-    // ใหม่: อัปเดตหมายเหตุของ "ทุกชิ้น" ที่เป็นเมนูเดียวกันในตะกร้า
     updateNoteForFood: (state, action) => {
       const { food_id, note } = action.payload;
       state.items = state.items.map(item =>
@@ -40,7 +39,6 @@ export const selectCartItems = state => state.cart.items;
 
 export const selectCartItemsById = (state, id) => state.cart.items.filter(item => item.id == id);
 
-// ปรับวิธีบวกเลขให้สะอาดตามมาตรฐาน JS: total + item.price
 export const selectCartTotal = state => state.cart.items.reduce((total, item) => total + (item.price || 0), 0);
 
 export default cartSlice.reducer;
