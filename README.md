@@ -31,13 +31,9 @@ extract file: restaurant-project.zip
 
 cd restaurant-project
 
-npx create-expo-app@latest client --template blank
-
 npm install nativewind@4.2.7 react-native-reanimated react-native-safe-area-context
 
 npm install --save-dev tailwindcss@^3.4.17 prettier-plugin-tailwindcss@^0.5.11 babel-preset-expo
-
-npx tailwindcss init
 
 npx expo install react-native-screens react-native-safe-area-context
 
@@ -50,10 +46,6 @@ npm install @reduxjs/toolkit
 npm install react-redux
 
 npx expo install expo-sqlite
-
-ติดตั้งเสร็จทำตามลิ้ง
-
-https://www.nativewind.dev/docs/getting-started/installation#3-add-the-babel-preset
 
 library ที่ติดตั้งเพิ่ม
 
