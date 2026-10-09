@@ -1,5 +1,3 @@
-// db/menu.js
-
 // ดึงหมวดหมู่ทั้งหมด
 export async function getCategories(db) {
   return await db.getAllAsync('SELECT * FROM categories ORDER BY category_id ASC;');

@@ -1,6 +1,3 @@
-// db/kitchen.js
-
-
 export async function getKitchenQueue(db) {
   return await db.getAllAsync(`
     SELECT 

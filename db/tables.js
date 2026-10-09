@@ -1,4 +1,3 @@
-// db/tables.js
 import { getBillTotal } from './orders';
 
 // ดึงรายชื่อโต๊ะทั้งหมด 15 โต๊ะ พร้อมสถานะและยอดค้างชำระ (คำนวณด้วย SQL)
@@ -21,7 +20,7 @@ export async function getAllTablesWithStatus(db) {
   `);
 }
 
-// หาบิลที่เปิดค้างอยู่ของโต๊ะ หรือเปิดบิลใหม่ถ้ายังไม่มี (ก1)
+// หาบิลที่เปิดค้างอยู่ของโต๊ะ หรือเปิดบิลใหม่ถ้ายังไม่มี
 export async function getOrCreateActiveBill(db, tableId) {
   const existingBill = await db.getFirstAsync(
     'SELECT * FROM bills WHERE table_id = ? AND status = ? LIMIT 1;',
@@ -45,7 +44,7 @@ export async function getOrCreateActiveBill(db, tableId) {
   };
 }
 
-// ปิดบิล (ก10)
+// ปิดบิล
 export async function closeBill(db, billId) {
   await db.runAsync(
     "UPDATE bills SET status = 'closed', closed_at = CURRENT_TIMESTAMP WHERE bill_id = ?;",

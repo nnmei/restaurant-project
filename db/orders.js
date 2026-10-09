@@ -1,7 +1,5 @@
-// db/orders.js
-
 /**
- * ส่งรายการอาหาร 1 รอบการสั่ง โดยใช้ Transaction เดียว (ตามข้อ 3.2 ข้อ 6)
+ * ส่งรายการอาหาร 1 รอบการสั่ง โดยใช้ Transaction เดียว
  * cartItems: [{ food_id, price, quantity, note }]
  */
 export async function submitOrderRound(db, billId, cartItems) {

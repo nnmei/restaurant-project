@@ -1,5 +1,3 @@
-// db/database.js
-
 export async function initializeDatabase(db) {
   await db.execAsync('PRAGMA foreign_keys = ON;');
 
