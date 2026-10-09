@@ -1,5 +1,4 @@
 -- schema.sql
--- บังคับเปิด Foreign Keys
 PRAGMA foreign_keys = ON;
 
 -- 1. ตารางหมวดหมู่อาหาร
@@ -9,7 +8,6 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 -- 2. ตารางรายการอาหาร
--- ราคาเป็น INTEGER ห้ามใช้ REAL ตามข้อห้ามข้อ 3
 CREATE TABLE IF NOT EXISTS food (
     food_id INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id INTEGER NOT NULL,
@@ -45,7 +43,6 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- 6. ตารางรายการอาหารในแต่ละรอบ (Order Items)
--- Snapshot ราคา ณ ตอนสั่งซื้อ เพื่อแก้ปัญหาราคาเปลี่ยนย้อนหลัง
 CREATE TABLE IF NOT EXISTS order_items (
     order_item_id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id INTEGER NOT NULL,
@@ -59,12 +56,8 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (food_id) REFERENCES food (food_id) ON DELETE RESTRICT
 );
 
--- สร้าง INDEX ตามข้อกำหนด 3.2 (อย่างน้อย 2 จุด)
--- Index 1: ค้นหาบิลที่เปิดค้างอยู่ของโต๊ะ
 CREATE INDEX IF NOT EXISTS idx_bills_table_status ON bills (table_id, status);
 
--- Index 2: หน้าจอครัวดึงคิวเรียงตามเวลาและสถานะ
 CREATE INDEX IF NOT EXISTS idx_order_items_status_time ON order_items (item_status, created_at);
 
--- Index 3: ค้นหารายการอาหารตาม order_id
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
