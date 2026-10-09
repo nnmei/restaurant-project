@@ -23,7 +23,7 @@ components/cardTable
 
 screens/TableSelectScreen, OrderScreen
 
-Youtube: https://youtu.be/-qMbkp3iJsw?si=Iiqk5xCxZN7Zvqn1
+Youtube: https://www.youtube.com/watch?v=z7vQp0E4rM4
 
 Github: https://github.com/nnmei/restaurant-project.git
 
