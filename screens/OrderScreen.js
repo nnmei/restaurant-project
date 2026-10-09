@@ -53,6 +53,9 @@ export default function OrderScreen({ route, navigation }) {
     <View style={OrderStyle.orderContainer}>
       <View style={OrderStyle.orderHeader}>
         <Text style={OrderStyle.orderTitle}>บิลโต๊ะที่ {tableNumber}</Text>
+        {route.params?.isHistory && (
+          <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 13, marginTop: 4 }}></Text>
+        )}
       </View>
 
       <ScrollView style={{ flex: 1 }}>
@@ -81,20 +84,13 @@ export default function OrderScreen({ route, navigation }) {
         <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>ยอดรวมทั้งหมด: {totalAmount.toLocaleString()} บาท</Text>
         
         <View style={{ flexDirection: 'row', gap: 10 }}>
-          {/* ปุ่มสั่งอาหารเพิ่ม */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Home', { tableId, tableNumber })}
-            style={{ flex: 1, backgroundColor: '#ea580c', padding: 14, borderRadius: 8, alignItems: 'center' }}
-          >
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>+ สั่งเพิ่ม</Text>
-          </TouchableOpacity>
 
-          {/* ปุ่มปิดบิล */}
+          {/* ปุ่มปิดบิลกดแล้วกลับไปหน้าโต๊ะ */}
           <TouchableOpacity
-            onPress={handleCloseBill}
+            onPress={() => navigation.navigate('TableSelect')}
             style={{ flex: 1, backgroundColor: '#ef4444', padding: 14, borderRadius: 8, alignItems: 'center' }}
           >
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>ปิดบิล / คิดเงิน</Text>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>กลับ</Text>
           </TouchableOpacity>
         </View>
       </View>
