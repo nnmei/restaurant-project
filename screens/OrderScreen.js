@@ -9,7 +9,7 @@ const STATUS_TH = { pending: 'รอทำ', cooking: 'กำลังทำ', s
 
 export default function OrderScreen({ route, navigation }) {
   const db = useSQLiteContext();
-  const { tableId, billId, tableNumber } = route.params || {};
+  const { tableId, billId, tableNumber, isHistory } = route.params || {};
   const [billItems, setBillItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
 
@@ -54,7 +54,9 @@ export default function OrderScreen({ route, navigation }) {
       <View style={OrderStyle.orderHeader}>
         <Text style={OrderStyle.orderTitle}>บิลโต๊ะที่ {tableNumber}</Text>
         {route.params?.isHistory && (
-          <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 13, marginTop: 4 }}></Text>
+          <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 13, marginTop: 4 }}>
+            (ประวัติบิล)
+          </Text>
         )}
       </View>
 
@@ -79,20 +81,34 @@ export default function OrderScreen({ route, navigation }) {
         })}
       </ScrollView>
 
-      {/* สรุปยอดรวมและปุ่มจัดการ */}
+      {/* สรุปยอดรวม */}
       <View style={{ paddingVertical: 16, borderTopWidth: 1, borderColor: '#e2e8f0' }}>
         <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>ยอดรวมทั้งหมด: {totalAmount.toLocaleString()} บาท</Text>
         
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-
-          {/* ปุ่มปิดบิลกดแล้วกลับไปหน้าโต๊ะ */}
+        {isHistory ? (
           <TouchableOpacity
-            onPress={() => navigation.navigate('TableSelect')}
-            style={{ flex: 1, backgroundColor: '#ef4444', padding: 14, borderRadius: 8, alignItems: 'center' }}
+            onPress={() => navigation.goBack()}
+            style={{ backgroundColor: '#ea580c', padding: 14, borderRadius: 8, alignItems: 'center' }}
           >
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>กลับ</Text>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>ย้อนกลับ</Text>
           </TouchableOpacity>
-        </View>
+        ) : (
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Home', { tableId, tableNumber })}
+              style={{ flex: 1, backgroundColor: '#ea580c', padding: 14, borderRadius: 8, alignItems: 'center' }}
+            >
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>+ สั่งเพิ่ม</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleCloseBill}
+              style={{ flex: 1, backgroundColor: '#ef4444', padding: 14, borderRadius: 8, alignItems: 'center' }}
+            >
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>ปิดบิล / คิดเงิน</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

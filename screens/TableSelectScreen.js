@@ -65,21 +65,20 @@ export default function TableSelectScreen() {
 
       <View style={TBstyle.header}>
         <Text style={TBstyle.screenTitle}>สถานะโต๊ะอาหาร (15 โต๊ะ)</Text>
-        <Text style={TBstyle.screenSubtitle}>
-          แตะเลือกโต๊ะเพื่อสั่งอาหาร หรือดูบิลที่ค้างอยู่
-        </Text>
-      </View>
-
-      <TouchableOpacity
+        <TouchableOpacity
             onPress={async () => {
               await resetSalesData(db);
               const data = await getAllTablesWithStatus(db);
               setTables(data);
               setSelectedTable(null);
             }}
-      >
-            <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 14, marginHorizontal: 20 }}>ล้างข้อมูล</Text>
-      </TouchableOpacity>
+          >
+            <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>ล้างข้อมูล</Text>
+        </TouchableOpacity>
+        <Text style={TBstyle.screenSubtitle}>
+          แตะเลือกโต๊ะเพื่อสั่งอาหาร หรือดูบิลที่ค้างอยู่
+        </Text>
+      </View>
 
       <FlatList
         data={tables}
